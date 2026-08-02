@@ -17,12 +17,16 @@ type AccordionItemProps = {
 };
 
 export default function AccordionItem({
+  id, //追加
   title,
   children,
   isOpen,
   onToggle,
   disabled = false,
 }: AccordionItemProps) {
+  // id="react" の場合、react-content という contentIdになる
+  const contentId = `${id}-content`; //追加
+
   return (
     <div
       className={cn(
@@ -34,6 +38,9 @@ export default function AccordionItem({
         type="button"
         disabled={disabled}
         onClick={onToggle}
+        //スクリーンリーダーなどに、状態を伝えられる
+        aria-expanded={isOpen} //追加、開いている場合 true、閉じている場合 false
+        aria-controls={contentId} //追加、
         className={cn(
           "flex w-full items-center justify-between px-4 py-3 text-left font-medium hover:bg-gray-100",
           disabled && "cursor-not-allowed hover:bg-transparent",
@@ -42,6 +49,8 @@ export default function AccordionItem({
         <span>{title}</span>
 
         <span
+          //単なる視覚的なアイコンなので、スクリーンリーダーには読み上げてもらう必要がない
+          aria-hidden="true" //追加
           className={cn(
             "transition-transform duration-200",
             isOpen && "rotate-90",
@@ -53,8 +62,10 @@ export default function AccordionItem({
 
       {/* isOpen={true} なら開く、isOpen={false} なら閉じる */}
       {isOpen && (
-        //
-        <div className={cn("border-t bg-gray-50 px-4 py-3")}>{children}</div>
+        // contentId が divのidになり、ボタンがこのコンテンツを操作している
+        <div id={contentId} className={cn("border-t bg-gray-50 px-4 py-3")}>
+          {children}
+        </div>
       )}
     </div>
   );
