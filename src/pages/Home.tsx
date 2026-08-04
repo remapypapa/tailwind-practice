@@ -554,6 +554,12 @@ export default function Home() {
               AccordionhPage
             </Link>
           </li>
+
+          <li>
+            <Link to="/ui/Tabs" className="text-blue-600 hover:underline">
+              TabsPage
+            </Link>
+          </li>
         </ul>
       </section>
     </div>

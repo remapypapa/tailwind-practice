@@ -85,6 +85,7 @@ import InputPage from "./pages/ui/InputPage";
 import RadioPage from "./pages/ui/RadioPage";
 import SelectPage from "./pages/ui/SelectPage";
 import SwitchPage from "./pages/ui/SwitchPage";
+import TabsPage from "./pages/ui/TabsPage";
 
 function App() {
   return (
@@ -187,6 +188,7 @@ function App() {
         <Route path="/ui/Radio" element={<RadioPage />} />
         <Route path="/ui/Switch" element={<SwitchPage />} />
         <Route path="/ui/Accordion" element={<AccordionPage />} />
+        <Route path="/ui/Tabs" element={<TabsPage />} />
       </Routes>
     </BrowserRouter>
   );
