@@ -71,7 +71,7 @@ TypeScript Panel表示
       <h1 className="mb-8 mt-6 text-3xl font-bold">React UI Components Tabs</h1>
       <div>
         <div className={cn("p-8")}>
-          <h1 className={cn("mb-6 text-2xl font-bold")}>Tabs</h1>
+          {/* <h1 className={cn("mb-6 text-2xl font-bold")}>Tabs</h1> */}
 
           <p className="bg-red-600 p-2 text-white">現在選択中: {activeTab}</p>
 

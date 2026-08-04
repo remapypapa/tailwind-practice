@@ -7,7 +7,7 @@ type TabItem = {
   //activeTab === item.id のようにする
   //id → プログラム内部で使う値、
   id: string;
-  //label → ユーザーに見せる文字
+  //label →
   label: string;
   //Tabs側はコンテンツの具体的な中身を知らなくていい
   content: React.ReactNode; //Reactで表示できるものなら何でも渡せる
@@ -32,28 +32,13 @@ export default function Tabs({
   onChange,
   className,
 }: TabsProps) {
-  //internalValue は、Tabs自身が管理している現在のTab
-  //defaultValue="react"なら、internalValue → "react"
-  //TypeScriptをクリック → setInternalValue("typescript"); となる
   const [internalValue, setInternalValue] = useState(
     defaultValue ?? items[0]?.id,
   );
-  //現在値value が存在すれば value を使い、なければ internalValue を使う
-  //親から activeTab を渡されることで、value値が入る → 初期値は"react"
-  //つまり、Controlledなら親のState、Uncontrolledなら内部Stateを使う
+
   const activeTab = value ?? internalValue;
-  //
+
   const handleChange = (nextValue: string) => {
-    //itemsがreact、typescript、javascriptの時、nextValue = "typescript" なら
-    //items.find((item) => item.id === nextValue) により
-    /* 
-    {
-      id: "typescript",
-      label: "TypeScript",
-  ...
-    }
-    が取得できる
-    */
     const item = items.find((item) => item.id === nextValue);
 
     if (!item || item.disabled) {
@@ -66,44 +51,78 @@ export default function Tabs({
 
   return (
     <div className={cn("w-full", className)}>
-      {/* Tab */}
-      <div className={cn("flex border-b border-gray-200")}>
-        {/* Tabを自動生成する */}
-        {items.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            //disabled={true} なら無効になる、disabled={false} なら通常のボタン
-            //item.disabled がundifinedでも問題ない
-            //disabled = true → 無効、disabled = false → 有効、disabled = undefined → 通常
-            disabled={item.disabled}
-            onClick={() => handleChange(item.id)}
-            className={cn(
-              "border-b-2 border-transparent px-4 py-2 text-sm font-medium",
-              "hover:text-gray-900",
-              //item.disabled === true ならreturn; する、つまり何もしない
-              //item.disabled === false なら State変更
-              item.disabled &&
-                "cursor-not-allowed opacity-50 hover:text-gray-500",
-              activeTab === item.id && "border-blue-500 text-blue-600",
-            )}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Panel */}
-      <div className={cn("p-4")}>
+      {/* Tab List */}
+      <div
+        //Tabをまとめている要素に tablist という役割を与えている
+        role="tablist"
+        className={cn("flex border-b border-gray-200")}
+      >
         {items.map((item) => {
-          //現在選択されているTabのコンテンツだけが表示される
-          if (item.id !== activeTab) {
-            return null;
-          }
+          //item.id = "react" なら、tabId → "tab-react"、panelId → "panel-react"
+          //TypeScriptなら、tab-typescript、panel-typescript
+          //データとしてのIDとDOM上のIDを分ける
+          //item.idはコンポーネント内部のデータ識別子
+          //id: "react" DOMでは、tab-react、panel-react という用途別のIDにする
+          //これにより、TabとPanelを間違えにくくなります。
+          const tabId = `tab-${item.id}`;
+          const panelId = `panel-${item.id}`;
 
-          return <div key={item.id}>{item.content}</div>;
+          //この1つのState判定から
+          //aria-selected={isActive} と isActive && "border-blue-500 text-blue-600" を作っている
+          const isActive = activeTab === item.id;
+
+          return (
+            <button
+              key={item.id}
+              id={tabId}
+              type="button"
+              role="tab"
+              //isActive を利用
+              aria-selected={isActive}
+              aria-controls={panelId}
+              disabled={item.disabled}
+              onClick={() => handleChange(item.id)}
+              className={cn(
+                "border-b-2 border-transparent px-4 py-2 text-sm font-medium",
+                "hover:text-gray-900",
+                item.disabled &&
+                  "cursor-not-allowed opacity-50 hover:text-gray-500",
+                //isActive を利用
+                isActive && "border-blue-500 text-blue-600",
+              )}
+            >
+              {item.label}
+            </button>
+          );
         })}
       </div>
+
+      {/* Tab Panels */}
+      {items.map((item) => {
+        if (item.id !== activeTab) {
+          return null;
+        }
+
+        const tabId = `tab-${item.id}`;
+        const panelId = `panel-${item.id}`;
+
+        return (
+          <div
+            key={item.id}
+            id={panelId}
+            //Panelには、role="tabpanel" をつける
+            // 「これはTabによって切り替えられるコンテンツ領域です」 という意味
+            role="tabpanel"
+            //このPanelはどのTabに対応しているのかが分かる
+            //<div id="panel-react" role="tabpanel" aria-labelledby="tab-react"> なら
+            //panel-react → tab-react → React という関係
+            aria-labelledby={tabId}
+            className={cn("p-4")}
+          >
+            {item.content}
+          </div>
+        );
+      })}
     </div>
   );
 }
