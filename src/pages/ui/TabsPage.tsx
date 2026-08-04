@@ -1,5 +1,6 @@
 import Tabs from "@/components/ui/tabs/Tabs";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const items = [
@@ -39,6 +40,28 @@ const items = [
 ];
 
 export default function TabsPage() {
+  //重要、状態を持つ = 親がStateを持っている
+  /*Tabクリック
+   ↓
+Tabs
+   ↓
+onChange("typescript")
+   ↓
+TabsPage
+   ↓
+setActiveTab("typescript")
+   ↓
+再レンダリング
+   ↓
+Tabsにvalue="typescript"
+   ↓
+TypeScript Panel表示
+
+という流れになり、これがReactにおける Stateのリフトアップ（State Lifting） の基本的な考え方
+複数のUIで同じStateを使いたいなら、共通の親へStateを持ち上げる
+*/
+  //activeTabの初期値は、"react"、つまり読み込み時はReact タブが開いている
+  const [activeTab, setActiveTab] = useState("react");
   return (
     <div className="p-8">
       <Link to="/" className="text-blue-600 hover:underline">
@@ -49,7 +72,10 @@ export default function TabsPage() {
         <div className={cn("p-8")}>
           <h1 className={cn("mb-6 text-2xl font-bold")}>Tabs</h1>
 
-          <Tabs items={items} defaultValue="react" />
+          <p className="bg-red-600 p-2 text-white">現在選択中: {activeTab}</p>
+
+          {/* value={activeTab}は現在値、onChange={setActiveTab} 値が変更されたことを親に通知 */}
+          <Tabs items={items} value={activeTab} onChange={setActiveTab} />
         </div>
       </div>
     </div>

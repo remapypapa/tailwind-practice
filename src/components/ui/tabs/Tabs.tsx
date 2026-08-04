@@ -11,21 +11,42 @@ type TabItem = {
 
 type TabsProps = {
   items: TabItem[]; //items は TabItem型の配列
+  //最初はどのTabを開いておくか
   defaultValue?: string;
+  //現在どのTabを選択しているか
+  value?: string; //追加
+  onChange?: (value: string) => void; //追加
   className?: string;
 };
 
-export default function Tabs({ items, defaultValue, className }: TabsProps) {
-  //最重要
-  //const [state, setState] = useState(初期値); が基本系
-  //defaultValue ?? items[0]?.id は、初期値を示している
-  //defaultValueが nullでもundefinedでもなければdefaultValueを使う。そうでなければitems[0]?.idを使う。
-  //??は Null合体演算子（Nullish Coalescing Operator）
-  //items[0]?.id は、最初の要素のid の意味、?. はオプショナルチェーン
-  //items[0].id にすると、items[0]が存在しない場合にエラーになる可能性があるが、
-  //items[0]?.id にすることで、items[0]が存在しない場合にundefinedになる
-  //const [activeTab, setActiveTab] = useState<string>();なので、開くのは1つのみ
-  const [activeTab, setActiveTab] = useState(defaultValue ?? items[0]?.id);
+export default function Tabs({
+  items,
+  defaultValue,
+  value,
+  onChange,
+  className,
+}: TabsProps) {
+  //internalValue は、Tabs自身が管理している現在のTab
+  //defaultValue="react"なら、internalValue → "react"
+  //TypeScriptをクリック → setInternalValue("typescript"); となる
+  const [internalValue, setInternalValue] = useState(
+    defaultValue ?? items[0]?.id,
+  );
+  //現在値value が存在すれば value を使い、なければ internalValue を使う
+  //親から activeTab を渡されることで、value値が入る → 初期値は"react"
+  //つまり、Controlledなら親のState、Uncontrolledなら内部Stateを使う
+  const activeTab = value ?? internalValue;
+  //Tabをクリックすると、onClick={() => handleChange(item.id)}が実行される
+  //TypeScriptをクリック → handleChange("typescript")
+  //その中で、setInternalValue("typescript"); と onChange?.("typescript"); を実行
+  const handleChange = (nextValue: string) => {
+    setInternalValue(nextValue);
+    //重要、if (onChange) {onChange(nextValue);} と同じ意味
+    //つまり、onChangeが渡されている場合だけ実行します。
+    //<Tabs items={items}/> なら onchangeはない、よって何もしない
+    //一方、<Tabs items={items} onChange={(value) => {console.log(value); }}/> なら 実行される
+    onChange?.(nextValue);
+  };
 
   return (
     <div className={cn("w-full", className)}>
@@ -36,7 +57,7 @@ export default function Tabs({ items, defaultValue, className }: TabsProps) {
           <button
             key={item.id}
             type="button"
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => handleChange(item.id)}
             className={cn(
               "px-4 py-2 text-sm font-medium",
               "border-b-2 border-transparent",
