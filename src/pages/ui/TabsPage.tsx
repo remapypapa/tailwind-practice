@@ -29,6 +29,7 @@ const items = [
   {
     id: "tailwind",
     label: "Tailwind CSS",
+    disabled: true,
     content: (
       <div>
         <h2 className={cn("mb-2 text-lg font-bold")}>Tailwind CSS</h2>

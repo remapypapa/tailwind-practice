@@ -3,10 +3,16 @@ import { useState } from "react";
 
 //TabItemの型を定義
 type TabItem = {
+  //idは単なる番号ではない、id → 現在選択されているTab → 表示するPanel という関係を作るためのもの
+  //activeTab === item.id のようにする
+  //id → プログラム内部で使う値、
   id: string;
+  //label → ユーザーに見せる文字
   label: string;
   //Tabs側はコンテンツの具体的な中身を知らなくていい
   content: React.ReactNode; //Reactで表示できるものなら何でも渡せる
+  //各Itemが自分自身の状態を持つようにする
+  disabled?: boolean; //追加
 };
 
 type TabsProps = {
@@ -36,15 +42,25 @@ export default function Tabs({
   //親から activeTab を渡されることで、value値が入る → 初期値は"react"
   //つまり、Controlledなら親のState、Uncontrolledなら内部Stateを使う
   const activeTab = value ?? internalValue;
-  //Tabをクリックすると、onClick={() => handleChange(item.id)}が実行される
-  //TypeScriptをクリック → handleChange("typescript")
-  //その中で、setInternalValue("typescript"); と onChange?.("typescript"); を実行
+  //
   const handleChange = (nextValue: string) => {
+    //itemsがreact、typescript、javascriptの時、nextValue = "typescript" なら
+    //items.find((item) => item.id === nextValue) により
+    /* 
+    {
+      id: "typescript",
+      label: "TypeScript",
+  ...
+    }
+    が取得できる
+    */
+    const item = items.find((item) => item.id === nextValue);
+
+    if (!item || item.disabled) {
+      return;
+    }
+
     setInternalValue(nextValue);
-    //重要、if (onChange) {onChange(nextValue);} と同じ意味
-    //つまり、onChangeが渡されている場合だけ実行します。
-    //<Tabs items={items}/> なら onchangeはない、よって何もしない
-    //一方、<Tabs items={items} onChange={(value) => {console.log(value); }}/> なら 実行される
     onChange?.(nextValue);
   };
 
@@ -57,15 +73,18 @@ export default function Tabs({
           <button
             key={item.id}
             type="button"
+            //disabled={true} なら無効になる、disabled={false} なら通常のボタン
+            //item.disabled がundifinedでも問題ない
+            //disabled = true → 無効、disabled = false → 有効、disabled = undefined → 通常
+            disabled={item.disabled}
             onClick={() => handleChange(item.id)}
             className={cn(
-              "px-4 py-2 text-sm font-medium",
-              "border-b-2 border-transparent",
+              "border-b-2 border-transparent px-4 py-2 text-sm font-medium",
               "hover:text-gray-900",
-              //activeTab = "typescript"の場合、
-              //id = "react"、"tailwind"は不一致、"typescript" 一致する
-              //そのため、activeTab === item.id が true になる時CSSが追加される
-              //これは、StateがUIの見た目を決めていることになる = Reactの重要な考え方
+              //item.disabled === true ならreturn; する、つまり何もしない
+              //item.disabled === false なら State変更
+              item.disabled &&
+                "cursor-not-allowed opacity-50 hover:text-gray-500",
               activeTab === item.id && "border-blue-500 text-blue-600",
             )}
           >
