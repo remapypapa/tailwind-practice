@@ -81,6 +81,7 @@ import Etc9 from "./pages/etc/Etc9";
 import AccordionPage from "./pages/ui/AccordionPage";
 import ButtonPage from "./pages/ui/ButtonPage";
 import CheckboxPage from "./pages/ui/CheckboxPage";
+import DropdownMenuPage from "./pages/ui/DropdownMenuPage";
 import InputPage from "./pages/ui/InputPage";
 import RadioPage from "./pages/ui/RadioPage";
 import SelectPage from "./pages/ui/SelectPage";
@@ -189,6 +190,7 @@ function App() {
         <Route path="/ui/Switch" element={<SwitchPage />} />
         <Route path="/ui/Accordion" element={<AccordionPage />} />
         <Route path="/ui/Tabs" element={<TabsPage />} />
+        <Route path="/ui/DropdownMenu" element={<DropdownMenuPage />} />
       </Routes>
     </BrowserRouter>
   );

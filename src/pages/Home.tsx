@@ -560,6 +560,15 @@ export default function Home() {
               TabsPage
             </Link>
           </li>
+
+          <li>
+            <Link
+              to="/ui/DropdownMenu"
+              className="text-blue-600 hover:underline"
+            >
+              DropdownMenuPage
+            </Link>
+          </li>
         </ul>
       </section>
     </div>
