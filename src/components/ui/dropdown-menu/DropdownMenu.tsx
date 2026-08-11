@@ -1,64 +1,34 @@
-import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-export default function DropdownMenu() {
+type DropdownMenuProps = {
+  /*
+  DropdownMenu
+      │
+      └── children
+           ├── Trigger
+           └── Content
+  の構造になる
+  */
+  children: React.ReactNode;
+};
+
+export default function DropdownMenu({ children }: DropdownMenuProps) {
+  //この状態では、TriggerやContent から利用できない
+  /*
+  最終的には以下の状態にする
+  DropdownMenu
+      │
+      ▼
+DropdownMenuContext
+      │
+ ┌────┴─────┐
+ ▼          ▼
+Trigger    Content
+  
+Context に open と setOpen を入れれば、
+Trigger でopen を変更する、Contentで Openを確認する ことができる
+  */
   const [open, setOpen] = useState(false);
 
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={cn(
-          "rounded-md border px-4 py-2",
-          "bg-white text-sm font-medium",
-          "hover:bg-gray-50",
-        )}
-      >
-        メニュー
-      </button>
-
-      {open && (
-        <div
-          className={cn(
-            "absolute left-0 top-full z-10 mt-2",
-            "w-40 rounded-md border bg-white p-1 shadow-md",
-          )}
-        >
-          <button
-            type="button"
-            className={cn(
-              "block w-full rounded px-3 py-2",
-              "text-left text-sm",
-              "hover:bg-gray-100",
-            )}
-          >
-            編集
-          </button>
-
-          <button
-            type="button"
-            className={cn(
-              "block w-full rounded px-3 py-2",
-              "text-left text-sm",
-              "hover:bg-gray-100",
-            )}
-          >
-            コピー
-          </button>
-
-          <button
-            type="button"
-            className={cn(
-              "block w-full rounded px-3 py-2",
-              "text-left text-sm",
-              "hover:bg-gray-100",
-            )}
-          >
-            削除
-          </button>
-        </div>
-      )}
-    </div>
-  );
+  return <div className="relative">{children}</div>;
 }
