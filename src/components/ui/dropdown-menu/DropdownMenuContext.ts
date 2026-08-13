@@ -1,5 +1,6 @@
 import { createContext } from "react";
 
+//JSX構文がないため、このファイルの拡張子は、 .ts
 type DropdownMenuContextValue = {
   //Context に open と openを変更する関数を入れ共有する
   /* 
@@ -19,6 +20,22 @@ type DropdownMenuContextValue = {
   onOpenChange: (open: boolean) => void;
 };
 
+/* 
+Contextの型は、DropdownMenuContextValue または undefined
+そのため、const context = useContext(DropdownMenuContext); の結果は
+context
+  ↓
+DropdownMenuContextValue
+または
+undefined
+になる、よって
+
+if (!context) {
+  throw new Error(...);
+}
+でチェックしている、これにより、チェック後はTypeScriptが、
+「ここから先のcontextはundefinedではない」 と判断できる
+*/
 export const DropdownMenuContext = createContext<
   DropdownMenuContextValue | undefined
 >(undefined);

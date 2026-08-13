@@ -2,6 +2,19 @@ import { useContext } from "react";
 import { DropdownMenuContext } from "./DropdownMenuContext";
 
 //カスタムHook をつくる
+/* 
+このファイルの拡張子が、.ts である理由
+→ 「JSXを直接書いていないから」
+
+.ts と .tsx の違い
+
+TypeScriptでは基本的に、
+
+.ts → TypeScriptのコード
+.tsx → TypeScript + JSX
+
+という使い分けをします。
+*/
 export function useDropdownMenuContext() {
   /* 
   useDropdownMenuContext()

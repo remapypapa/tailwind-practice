@@ -1,5 +1,6 @@
 import DropdownMenu from "@/components/ui/dropdown-menu/DropdownMenu";
 import DropdownMenuContent from "@/components/ui/dropdown-menu/DropdownMenuContent";
+import DropdownMenuItem from "@/components/ui/dropdown-menu/DropdownMenuItem";
 import DropdownMenuTrigger from "@/components/ui/dropdown-menu/DropdownMenuTrigger";
 import { Link } from "react-router-dom";
 
@@ -14,43 +15,73 @@ export default function DropdownMenuPage() {
         React UI Components DropdownMenu
       </h1>
 
-      {/* 現状ではクリックしても開閉しない
-        現在は
-        DropdownMenu
-          │
-          ├── open = false
-          │
-          ├── Trigger
-          │
-          └── Content
-
-ところが、
-
-Trigger
-   ↓
-「クリックされた」
-   ↓
-どうやって親のopenを変更する？
-
-という問題があります。→ ❌ Triggerからopenを変更できない
-
-そして、
-
-Content
-   ↓
-openはtrue？
-   ↓
-どうやって親のopenを取得する？
-
-という問題もあります。 → ❌ Contentからopenを取得できない
-      */}
       <DropdownMenu>
         <DropdownMenuTrigger>メニュー</DropdownMenuTrigger>
 
         <DropdownMenuContent>
-          <div className="px-3 py-2 text-sm">メニュー内容</div>
+          {/* 現状ではクリックしても何も起こらない
+          onClick={() => ...} を渡せるようにすれば、処理はできます。
+          <DropdownMenuItem
+            onClick={() => console.log("編集")}
+          >
+            編集
+          </DropdownMenuItem>
+
+          しかし、Dropdown Menuにはもう一つやるべきことがある
+          Itemを選択したらMenuを閉じたい。
+
+          Menuを閉じる処理は誰が担当する？
+          流れとしては、
+
+            Itemクリック
+              ↓
+            編集処理
+              ↓
+            Menuを閉じる
+
+            となります。
+
+            DropdownMenuItem
+            は親の、
+
+            open
+            onOpenChange
+
+            を知る必要があります
+            すでにContextがあります
+
+            DropdownMenu
+                  │
+                  ▼
+            Context
+                  │
+                  ├── Trigger
+                  ├── Content
+                  └── Item
+          
+            なのでItemからも、
+            const { onOpenChange } =
+              useDropdownMenuContext();
+            
+            と取得できます。
+          */}
+          <DropdownMenuItem onSelect={() => console.log("編集")}>
+            編集
+          </DropdownMenuItem>
+
+          <DropdownMenuItem onSelect={() => console.log("コピー")}>
+            コピー
+          </DropdownMenuItem>
+
+          <DropdownMenuItem onSelect={() => console.log("削除")}>
+            削除
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
 }
+
+/*
+ここまでで、Dropdown Menuの基本的なCompound Components構造が完成
+*/
