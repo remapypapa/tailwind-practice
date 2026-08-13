@@ -73,62 +73,54 @@ Trigger でopen を変更する、Contentで Openを確認する ことができ
   );
 }
 /* 
-ContextをDropdownMenu.tsxに直接書かない理由 → 責務を分けるため
+現在の構造
+src/
+└── components/
+    └── ui/
+        └── dropdown-menu/
+            ├── DropdownMenu.tsx
+            ├── DropdownMenuContext.tsx
+            ├── useDropdownMenuContext.ts
+            ├── DropdownMenuTrigger.tsx
+            └── DropdownMenuContent.tsx
 
+役割もかなり明確です。
 DropdownMenu.tsx
     ↓
-Dropdown Menu本体の管理
+Stateを持つ / Providerを提供
 
 DropdownMenuContext.tsx
     ↓
-共有Stateの定義
+Contextの型とContext本体
 
-この設計にすることで、
-ContextはUIそのものではなく、コンポーネント間で共有する状態を管理する仕組み
-ということが分かりやすくなる
+useDropdownMenuContext.ts
+    ↓
+Contextを安全に取得
 
-現在のファイル構成
-src/
-├── components/
-│   └── ui/
-│       └── dropdown-menu/
-│           ├── DropdownMenu.tsx
-│           ├── DropdownMenuContext.tsx
-│           ├── DropdownMenuTrigger.tsx
-│           └── DropdownMenuContent.tsx
-│
-└── pages/
-    └── ui/
-        └── DropdownMenuPage.tsx
+DropdownMenuTrigger.tsx
+    ↓
+openを変更
 
-ここまでで、
-DropdownMenu
-     │
-     ▼
- Context
-     │
- ┌───┴────────┐
- ▼            ▼
-Trigger      Content
+DropdownMenuContent.tsx
+    ↓
+openを見て表示・非表示
 
-Compound Components + Contextの基本形ができた
+今回の学習ポイント
 
-理解すべきこと
-親コンポーネント
-    │
-    │ Stateを持つ
-    ▼
-DropdownMenu
-    │
-    │ Contextで共有
-    ▼
-DropdownMenuContext
-    │
-    ├──────────────┐
-    ▼              ▼
-Trigger          Content
-    │              │
-    │ useContext   │ useContext
-    ▼              ▼
-open変更         open参照
+useContextを直接使う
+const context = useContext(DropdownMenuContext);
+
+でも動く
+専用Hookを作る
+const { open, onOpenChange } =
+  useDropdownMenuContext();
+
+ことで、
+・Context取得処理を共通化できる
+・エラーチェックを共通化できる
+・コンポーネント側がContextの内部構造を意識しなくてよい
+・Contextの仕様変更に強くなる
+・コードが読みやすくなる
+
+というメリットがある
 */
