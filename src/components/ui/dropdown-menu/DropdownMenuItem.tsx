@@ -21,11 +21,46 @@ type DropdownMenuItemProps = {
   となる
   */
   onSelect?: () => void; //追加
+  /* 
+  disabled を ItemのPropsにした理由
+  <DropdownMenu disabled>
+  とすると、Menu全体が利用できない という意味になるため
+
+  以下を追加することで、Item単位のdisabledを実装
+  <DropdownMenuItem disabled> // 削除というMenu Itemは現在利用できないという意味
+    削除
+  </DropdownMenuItem>
+  
+  同様に、以下もItem単位でclassNameの追加が可能になるようにしている
+  <DropdownMenuItem className="font-bold">
+    編集
+  </DropdownMenuItem>
+  が可能になる
+  */
+  disabled?: boolean; //追加
+  className?: string; //追加
 };
 
 export default function DropdownMenuItem({
   children,
   onSelect,
+  /* 
+  デフォルト値を false にする、
+  disabledは
+    boolean
+    または
+    undefined
+
+  これにより、
+  <DropdownMenuItem> なら
+  disabled = false
+  として扱われる
+
+  <DropdownMenuItem disabled> なら
+  disabled = true
+  */
+  disabled = false,
+  className,
 }: DropdownMenuItemProps) {
   //これにより、Itemも親のStateを共有できる
   const { onOpenChange } = useDropdownMenuContext();
@@ -41,6 +76,11 @@ export default function DropdownMenuItem({
   という一連の動作を実現
   */
   const handleClick = () => {
+    //[追加]disabledなら何もしない
+    if (disabled) {
+      return;
+    }
+
     /* 
     onSelect が存在するなら実行する の意味
 
@@ -113,11 +153,30 @@ DropdownMenu側は、「何をするか」 を知りません。
   return (
     <button
       type="button"
+      /* 
+      disabled をbuttonに渡す
+      これによって、ブラウザ自身が
+      ・クリックできない
+      ・フォーカスできない
+      ・disabled状態として扱う
+
+      といった処理をしてくれます。
+      */
+      disabled={disabled} //追加
       onClick={handleClick}
       className={cn(
+        //基本スタイル
         "block w-full rounded px-3 py-2",
         "text-left text-sm",
         "hover:bg-gray-100",
+
+        //disabled時の追加スタイル
+        disabled && "cursor-not-allowed opacity-50", //追加
+
+        //className を最後に置く理由
+        // cn() の中で tailwind-merge が働くことで、競合するTailwindクラスを整理できる
+        //classNameは利用側から追加できる = スタイルを後で変更できる
+        className, //追加
       )}
     >
       {children}

@@ -72,10 +72,8 @@ export default function DropdownMenuPage() {
           <DropdownMenuItem onSelect={() => console.log("コピー")}>
             コピー
           </DropdownMenuItem>
-
-          <DropdownMenuItem onSelect={() => console.log("削除")}>
-            削除
-          </DropdownMenuItem>
+          {/* disabled 指定 */}
+          <DropdownMenuItem disabled>削除</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
