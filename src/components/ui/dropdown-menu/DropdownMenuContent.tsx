@@ -3,10 +3,12 @@ import { useDropdownMenuContext } from "./useDropdownMenuContext";
 
 type DropdownMenuContentProps = {
   children: React.ReactNode;
+  className?: string; //追加
 };
 
 export default function DropdownMenuContent({
   children,
+  className,
 }: DropdownMenuContentProps) {
   //カスタムHook を使う
   const { open } = useDropdownMenuContext();
@@ -18,8 +20,8 @@ export default function DropdownMenuContent({
   return (
     <div
       className={cn(
-        "absolute left-0 top-full z-10 mt-2",
-        "w-40 rounded-md border bg-white p-1 shadow-md",
+        "mt-2 w-48 rounded border bg-white p-1 shadow-md",
+        className,
       )}
     >
       {children}

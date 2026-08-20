@@ -2,9 +2,11 @@ import DropdownMenu from "@/components/ui/dropdown-menu/DropdownMenu";
 import DropdownMenuContent from "@/components/ui/dropdown-menu/DropdownMenuContent";
 import DropdownMenuItem from "@/components/ui/dropdown-menu/DropdownMenuItem";
 import DropdownMenuTrigger from "@/components/ui/dropdown-menu/DropdownMenuTrigger";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function DropdownMenuPage() {
+  const [open, setOpen] = useState(false);
   return (
     <div className="p-8">
       <Link to="/" className="text-blue-600 hover:underline">
@@ -15,7 +17,27 @@ export default function DropdownMenuPage() {
         React UI Components DropdownMenu
       </h1>
 
-      <DropdownMenu>
+      {/* 
+      Page
+      │
+      └── open
+            │
+            ▼
+      DropdownMenu
+            │
+            ▼
+      Context
+            │
+      ├── Trigger
+      ├── Content
+      └── Item
+
+      の構造に変更
+      */}
+      {/* 一時的に配置 */}
+      <p className="mt-4">Menu: {open ? "Open" : "Closed"}</p>
+
+      <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger>メニュー</DropdownMenuTrigger>
 
         <DropdownMenuContent>
@@ -81,5 +103,44 @@ export default function DropdownMenuPage() {
 }
 
 /*
-ここまでで、Dropdown Menuの基本的なCompound Components構造が完成
+今回起きていることを図にする
+現在、Pageでは、
+const [open, setOpen] = useState(false); がある
+
+そして
+<DropdownMenu
+  open={open}
+  onOpenChange={setOpen}
+>
+です
+
+Triggerをクリックすると、
+Trigger
+   │
+   │ onOpenChange(true)
+   ▼
+DropdownMenu
+   │
+   │ onOpenChange?.(true)
+   ▼
+Page
+   │
+   │ setOpen(true)
+   ▼
+open = true
+   │
+   ▼
+DropdownMenu
+   │
+   │ actualOpen = true
+   ▼
+Context
+   │
+   ├── Trigger
+   ├── Content
+   └── Item
+
+となる
+
+
 */

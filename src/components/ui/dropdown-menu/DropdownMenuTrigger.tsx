@@ -3,13 +3,19 @@ import { useDropdownMenuContext } from "./useDropdownMenuContext";
 
 type DropdownMenuTriggerProps = {
   children: React.ReactNode;
+  className?: string; //追加
 };
 
 export default function DropdownMenuTrigger({
   children,
+  className,
 }: DropdownMenuTriggerProps) {
   //カスタムHook を使うことでスッキリする
   const { open, onOpenChange } = useDropdownMenuContext();
+
+  const handleClick = () => {
+    onOpenChange(!open);
+  };
 
   return (
     <button
@@ -18,12 +24,8 @@ export default function DropdownMenuTrigger({
       //状態によって、aria-expanded="false"、aria-expanded="true" になる
       //aria-selected と同じく、ReactのStateをARIA属性に反映させる
       aria-expanded={open}
-      onClick={() => onOpenChange(!open)}
-      className={cn(
-        "rounded-md border px-4 py-2",
-        "bg-white text-sm font-medium",
-        "hover:bg-gray-50",
-      )}
+      onClick={handleClick}
+      className={cn("rounded border px-4 py-2", className)}
     >
       {children}
     </button>
