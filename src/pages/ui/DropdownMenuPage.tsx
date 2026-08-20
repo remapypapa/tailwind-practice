@@ -1,6 +1,8 @@
 import DropdownMenu from "@/components/ui/dropdown-menu/DropdownMenu";
 import DropdownMenuContent from "@/components/ui/dropdown-menu/DropdownMenuContent";
 import DropdownMenuItem from "@/components/ui/dropdown-menu/DropdownMenuItem";
+//追加
+import DropdownMenuSeparator from "@/components/ui/dropdown-menu/DropdownMenuSeparator";
 import DropdownMenuTrigger from "@/components/ui/dropdown-menu/DropdownMenuTrigger";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -94,6 +96,14 @@ export default function DropdownMenuPage() {
           <DropdownMenuItem onSelect={() => console.log("コピー")}>
             コピー
           </DropdownMenuItem>
+          {/* 追加 
+            区切り線 自体は
+            <div className="my-1 h-px bg-gray-200" />
+            と書くことも可能だが、これでは意味がわからない
+            コンポーネント化することで意味(=区切り線)が伴う
+          */}
+          <DropdownMenuSeparator />
+
           {/* disabled 指定 */}
           <DropdownMenuItem disabled>削除</DropdownMenuItem>
         </DropdownMenuContent>

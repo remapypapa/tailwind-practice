@@ -232,19 +232,74 @@ DropdownMenu
     │
     ├── DropdownMenuItem
     ├── DropdownMenuItem
+    ├── DropdownMenuSeparator
     └── DropdownMenuItem
 
-Contexは、
 DropdownMenu
-      │
-      ▼
-DropdownMenuContext
-      │
- ┌────┼──────────────┐
- ▼    ▼              ▼
-Trigger Content      Item
+という一つの巨大なコンポーネントを作るのではなく、
+役割ごとに小さなコンポーネントへ分割している
 
-かなりCompound Componentsらしくなった
+「大きなコンポーネント」と比較
+<DropdownMenu
+  items={[
+    { label: "編集" },
+    { label: "コピー" },
+    { separator: true },
+    { label: "削除" },
+  ]}
+/>
+
+としてしまう設計もあるが、UIの自由度が下がる
+Compound Componentsなら、
+<DropdownMenuContent>
+  <DropdownMenuItem>編集</DropdownMenuItem>
+
+  <DropdownMenuItem>コピー</DropdownMenuItem>
+
+  <DropdownMenuSeparator />
+
+  <DropdownMenuItem>削除</DropdownMenuItem>
+</DropdownMenuContent>
+
+とかける
+
+HTMLを書く感覚に近い形でUI構造を表現できる
+これはCompound Componentsの大きなメリット
+
+実務では両方ある
+Compound Components型
+<DropdownMenu>
+  <DropdownMenuTrigger>
+    メニュー
+  </DropdownMenuTrigger>
+
+  <DropdownMenuContent>
+    <DropdownMenuItem>編集</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>削除</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+
+データ駆動型
+<DropdownMenu
+  items={[
+    { label: "編集" },
+    { label: "削除" },
+  ]}
+/>
+
+どちらが絶対に正しいということではない
+
+今回のProps設計
+type DropdownMenuSeparatorProps = {
+  className?: string;
+};
+
+のみ、かなり少ない
+Propsは、
+「将来使いそうだから、とりあえず増やす」 のではなく
+そのコンポーネントに本当に必要な情報だけ持たせる
+のが基本
 
 
 */
