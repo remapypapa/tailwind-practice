@@ -4,6 +4,8 @@ import DropdownMenuItem from "@/components/ui/dropdown-menu/DropdownMenuItem";
 //追加
 import DropdownMenuSeparator from "@/components/ui/dropdown-menu/DropdownMenuSeparator";
 import DropdownMenuTrigger from "@/components/ui/dropdown-menu/DropdownMenuTrigger";
+//追加
+import DropdownMenuLabel from "@/components/ui/dropdown-menu/DropdownMenuLabel";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -43,69 +45,23 @@ export default function DropdownMenuPage() {
         <DropdownMenuTrigger>メニュー</DropdownMenuTrigger>
 
         <DropdownMenuContent>
-          {/* 現状ではクリックしても何も起こらない
-          onClick={() => ...} を渡せるようにすれば、処理はできます。
-          <DropdownMenuItem
-            onClick={() => console.log("編集")}
-          >
-            編集
+          <DropdownMenuLabel>アカウント</DropdownMenuLabel>
+
+          <DropdownMenuItem onSelect={() => console.log("プロフィール")}>
+            プロフィール
           </DropdownMenuItem>
 
-          しかし、Dropdown Menuにはもう一つやるべきことがある
-          Itemを選択したらMenuを閉じたい。
-
-          Menuを閉じる処理は誰が担当する？
-          流れとしては、
-
-            Itemクリック
-              ↓
-            編集処理
-              ↓
-            Menuを閉じる
-
-            となります。
-
-            DropdownMenuItem
-            は親の、
-
-            open
-            onOpenChange
-
-            を知る必要があります
-            すでにContextがあります
-
-            DropdownMenu
-                  │
-                  ▼
-            Context
-                  │
-                  ├── Trigger
-                  ├── Content
-                  └── Item
-          
-            なのでItemからも、
-            const { onOpenChange } =
-              useDropdownMenuContext();
-            
-            と取得できます。
-          */}
-          <DropdownMenuItem onSelect={() => console.log("編集")}>
-            編集
+          <DropdownMenuItem onSelect={() => console.log("設定")}>
+            設定
           </DropdownMenuItem>
 
-          <DropdownMenuItem onSelect={() => console.log("コピー")}>
-            コピー
-          </DropdownMenuItem>
-          {/* 追加 
-            区切り線 自体は
-            <div className="my-1 h-px bg-gray-200" />
-            と書くことも可能だが、これでは意味がわからない
-            コンポーネント化することで意味(=区切り線)が伴う
-          */}
           <DropdownMenuSeparator />
 
-          {/* disabled 指定 */}
-          <DropdownMenuItem disabled>削除</DropdownMenuItem>
+          <DropdownMenuLabel>その他</DropdownMenuLabel>
+
+          <DropdownMenuItem onSelect={() => console.log("ログアウト")}>
+            ログアウト
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -113,44 +69,131 @@ export default function DropdownMenuPage() {
 }
 
 /*
-今回起きていることを図にする
-現在、Pageでは、
-const [open, setOpen] = useState(false); がある
+3種類を比較
+現在、Contentの中には、
 
-そして
-<DropdownMenu
-  open={open}
-  onOpenChange={setOpen}
->
-です
+DropdownMenuLabel
+DropdownMenuItem
+DropdownMenuSeparator
+がある
 
-Triggerをクリックすると、
-Trigger
-   │
-   │ onOpenChange(true)
-   ▼
+役割の違い
+コンポーネント	        役割	                  操作
+DropdownMenuLabel	    メニューのグループ名・説明	しない
+DropdownMenuItem	    メニュー項目	            する
+DropdownMenuSeparator	項目の区切り	            しない
+
+Item と Label を同じコンポーネントにしない理由
+<DropdownMenuItem>
+  アカウント
+</DropdownMenuItem>
+として
+アカウント
+プロフィール
+設定
+を全部Itemにすることも技術的には可能
+
+しかし、
+アカウント はクリックして何かを実行するものではない
+一方
+プロフィール
+設定
+は操作対象
+
+UIの構造として、
+アカウント
+ ├── プロフィール
+ └── 設定
+という意味の違いがある
+
+よって
+<DropdownMenuLabel>
+  アカウント
+</DropdownMenuLabel>
+と
+<DropdownMenuItem>
+  プロフィール
+</DropdownMenuItem>
+に分ける
+
+コードから
+アカウント
+ ├─ プロフィール
+ └─ 設定
+
+────────────
+
+その他
+ └─ ログアウト
+
+というUIの意味・構造がコードから読み取れる
+これがCompound Componentsの大きなメリット
+
+「見た目」ではなく「役割」でコンポーネントを分ける
+Label
+↓
+説明・分類
+
+Item
+↓
+操作
+
+Separator
+↓
+区切り
+
+という役割の違いがある
+実務では、この「役割」を意識してコンポーネントを分割することが非常に重要
+
+現在のDropdown Menuを整理
 DropdownMenu
-   │
-   │ onOpenChange?.(true)
-   ▼
-Page
-   │
-   │ setOpen(true)
-   ▼
-open = true
-   │
-   ▼
+│
+├── DropdownMenuTrigger
+│
+└── DropdownMenuContent
+    │
+    ├── DropdownMenuLabel
+    ├── DropdownMenuItem
+    ├── DropdownMenuItem
+    ├── DropdownMenuSeparator
+    ├── DropdownMenuLabel
+    └── DropdownMenuItem
+
+さらにContextによって、
 DropdownMenu
-   │
-   │ actualOpen = true
-   ▼
-Context
-   │
-   ├── Trigger
-   ├── Content
-   └── Item
+      │
+      ▼
+DropdownMenuContext
+      │
+ ┌────┼───────────────┐
+ ▼    ▼               ▼
+Trigger Content       Item
 
-となる
+とStateが共有されている
 
+一方
+Label
+Separator
 
+は現在、Menuの開閉Stateを必要としていない
+この違いも重要
+
+Contextを「何でも共有する場所」にしない
+const context = {
+  open,
+  onOpenChange,
+  disabled,
+  className,
+  label,
+  ...
+};
+のように、何でもContextに入れてしまう設計は避ける
+Contextに入れるべきなのは、
+Compound Components間で共有する必要がある状態・機能
+
+今回であれば、
+open
+onOpenChange
+
+DropdownMenuLabel はこれを必要としていないので、Contextを使いません。
 */
