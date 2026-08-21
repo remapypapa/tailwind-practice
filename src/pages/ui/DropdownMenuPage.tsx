@@ -1,11 +1,11 @@
 import DropdownMenu from "@/components/ui/dropdown-menu/DropdownMenu";
 import DropdownMenuContent from "@/components/ui/dropdown-menu/DropdownMenuContent";
 import DropdownMenuItem from "@/components/ui/dropdown-menu/DropdownMenuItem";
-//追加
+import DropdownMenuLabel from "@/components/ui/dropdown-menu/DropdownMenuLabel";
 import DropdownMenuSeparator from "@/components/ui/dropdown-menu/DropdownMenuSeparator";
 import DropdownMenuTrigger from "@/components/ui/dropdown-menu/DropdownMenuTrigger";
 //追加
-import DropdownMenuLabel from "@/components/ui/dropdown-menu/DropdownMenuLabel";
+import DropdownMenuGroup from "@/components/ui/dropdown-menu/DropdownMenuGroup";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -45,23 +45,27 @@ export default function DropdownMenuPage() {
         <DropdownMenuTrigger>メニュー</DropdownMenuTrigger>
 
         <DropdownMenuContent>
-          <DropdownMenuLabel>アカウント</DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>アカウント</DropdownMenuLabel>
 
-          <DropdownMenuItem onSelect={() => console.log("プロフィール")}>
-            プロフィール
-          </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => console.log("プロフィール")}>
+              プロフィール
+            </DropdownMenuItem>
 
-          <DropdownMenuItem onSelect={() => console.log("設定")}>
-            設定
-          </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => console.log("設定")}>
+              設定
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
 
           <DropdownMenuSeparator />
 
-          <DropdownMenuLabel>その他</DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>その他</DropdownMenuLabel>
 
-          <DropdownMenuItem onSelect={() => console.log("ログアウト")}>
-            ログアウト
-          </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => console.log("ログアウト")}>
+              ログアウト
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -69,131 +73,141 @@ export default function DropdownMenuPage() {
 }
 
 /*
-3種類を比較
-現在、Contentの中には、
+div の意味を考える
+Groupの実装は、
+<div>
+  {children}
+</div>
 
-DropdownMenuLabel
-DropdownMenuItem
-DropdownMenuSeparator
+HTMLだけを見ると、ただのdiv
+
+role="group" を追加すると
+ただのdiv
+↓
+グループという意味を持つ要素 になる
+これはReactのコンポーネント設計で重要な考え方
+コンポーネントの価値は、必ずしも複雑なロジックにあるわけではない
+
+Group自身はStateを持つべきか？
+今回、const [open, setOpen] = useState(...) 
+のようなStateは持たない
+
+Groupの責任は、Itemをグループとしてまとめる
+Menuの開閉は、DropdownMenu の責任
+
+Groupは、DropdownMenuGroup の責任として構造をまとめるだけ
+これは、Single Responsibilityの考え方にもつながる
+
+Contextも使わない
+同じ理由で、
+useDropdownMenuContext() も使わない
+
+現在Contextには、
+open
+onOpenChange
 がある
 
-役割の違い
-コンポーネント	        役割	                  操作
-DropdownMenuLabel	    メニューのグループ名・説明	しない
-DropdownMenuItem	    メニュー項目	            する
-DropdownMenuSeparator	項目の区切り	            しない
+Groupはこれらを必要としない
+DropdownMenuGroup
+       │
+       └── Context不要
+これは前回のLabel、Separatorとも同じ
 
-Item と Label を同じコンポーネントにしない理由
-<DropdownMenuItem>
-  アカウント
-</DropdownMenuItem>
-として
-アカウント
-プロフィール
-設定
-を全部Itemにすることも技術的には可能
+Dropdown Menuの責任分担
+コンポーネント	          主な責任
+DropdownMenu	          開閉State
+DropdownMenuTrigger	    開閉操作
+DropdownMenuContent	    Menu本体の表示
+DropdownMenuItem	      選択可能な項目
+DropdownMenuLabel	      グループの見出し
+DropdownMenuSeparator	  区切り
+DropdownMenuGroup	      関連項目のグループ化
 
-しかし、
-アカウント はクリックして何かを実行するものではない
-一方
-プロフィール
-設定
-は操作対象
+DropdownMenuGroup と DropdownMenuContent の違い
+どちらも、children を持つ
+何が違うのか？
 
-UIの構造として、
-アカウント
- ├── プロフィール
- └── 設定
-という意味の違いがある
+Content
+Menuそのもの
 
-よって
-<DropdownMenuLabel>
-  アカウント
-</DropdownMenuLabel>
-と
-<DropdownMenuItem>
-  プロフィール
-</DropdownMenuItem>
-に分ける
+Contextから
+open
+を取得して
+if (!open) {
+  return null;
+}
+などを行う
 
-コードから
-アカウント
- ├─ プロフィール
- └─ 設定
+Group
+Menu内部の一部分、開閉Stateを知る必要はない
 
-────────────
-
-その他
- └─ ログアウト
-
-というUIの意味・構造がコードから読み取れる
-これがCompound Componentsの大きなメリット
-
-「見た目」ではなく「役割」でコンポーネントを分ける
-Label
+つまり
+DropdownMenuContent
 ↓
-説明・分類
+Menuの表示責任
 
-Item
+DropdownMenuGroup
 ↓
-操作
+Menu内部の構造化
 
-Separator
-↓
-区切り
-
-という役割の違いがある
-実務では、この「役割」を意識してコンポーネントを分割することが非常に重要
-
-現在のDropdown Menuを整理
+Compound Componentsとしての現在の構造
 DropdownMenu
 │
-├── DropdownMenuTrigger
+├── Trigger
 │
-└── DropdownMenuContent
+└── Content
     │
-    ├── DropdownMenuLabel
-    ├── DropdownMenuItem
-    ├── DropdownMenuItem
-    ├── DropdownMenuSeparator
-    ├── DropdownMenuLabel
-    └── DropdownMenuItem
+    ├── Group
+    │   ├── Label
+    │   ├── Item
+    │   └── Item
+    │
+    ├── Separator
+    │
+    └── Group
+        ├── Label
+        └── Item
 
-さらにContextによって、
+Stateは
 DropdownMenu
       │
       ▼
-DropdownMenuContext
+ Context
       │
- ┌────┼───────────────┐
- ▼    ▼               ▼
-Trigger Content       Item
+ ┌────┼──────┐
+ ▼    ▼      ▼
+Trigger Content Item
 
-とStateが共有されている
+Group / Label / Separatorは、現時点ではContextを必要としない
+「必要なコンポーネントだけContextに依存する」
 
-一方
-Label
-Separator
+実際のDropdown Menuでは、
+Group
+├── Label
+├── Item
+├── Item
+└── Item
 
-は現在、Menuの開閉Stateを必要としていない
-この違いも重要
+だけでなく
+Group
+├── Label
+├── Item
+│   ├── Icon
+│   └── Shortcut
+├── Item
+└── Item
+などにもなる
 
-Contextを「何でも共有する場所」にしない
-const context = {
-  open,
-  onOpenChange,
-  disabled,
-  className,
-  label,
-  ...
-};
-のように、何でもContextに入れてしまう設計は避ける
-Contextに入れるべきなのは、
-Compound Components間で共有する必要がある状態・機能
+さらに、
 
-今回であれば、
-open
-onOpenChange
+・サブメニュー
+・Checkbox Item
+・Radio Group
+・Shortcut表示
+・Icon
+・destructive item
+・disabled item
 
-DropdownMenuLabel はこれを必要としていないので、Contextを使いません。
+などが追加されます。
+
 */
