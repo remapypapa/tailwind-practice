@@ -267,4 +267,27 @@ DropdownMenu API
 onSelect
 
 これは内部実装と外部APIを分離している
+
+onClick と onSelect をどうするか？
+onClick={handleClick}
+としている
+
+しかし、既存のDropdownMenuItemには、
+onSelect
+がある、これは後で整理する必要がある
+
+実務的には
+DropdownMenuItem
+DropdownMenuCheckboxItem
+でイベント設計を統一した方が扱いやすくなる
+
+将来的には、
+<DropdownMenuCheckboxItem
+  onCheckedChange={setNotifications}
+>
+  通知
+</DropdownMenuCheckboxItem>
+
+のようなAPIを作る方向に進む
+
 */
